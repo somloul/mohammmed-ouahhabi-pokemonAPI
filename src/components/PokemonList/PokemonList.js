@@ -1,13 +1,36 @@
-import React  from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import SearchBar from './SearchBar';
+import PokemonCard from './PokemonCard';
 
-function PokemonList({ searchTerm = "" }) {
+const PokemonList = () => {
+  const [data, setData] = useState({ results: [] });
+  const [search, setSearch] = useState('');
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios('https://pokeapi.co/api/v2/pokemon?limit=50');
+      setData(result.data);
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredPokemon = data.results.filter(pokemon =>
+      pokemon.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <ul>
-    <li>test</li>
-    <li>test2</li>
-    </ul>
+      <li>
+          <div>
+            <SearchBar value={search} onChange={setSearch} />
+            <div >
+              {filteredPokemon.map(pokemon => (
+                  <PokemonCard key={pokemon.name} url={pokemon.url} />
+              ))}
+            </div>
+          </div>
+      </li>
   );
 }
 
